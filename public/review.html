@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Review & Send Email</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style type="text/tailwindcss">
+        /* Custom Tailwind styles for a cohesive theme */
+        @layer base {
+            body {
+                @apply bg-gray-100 text-gray-900 dark:bg-slate-900 dark:text-gray-100 transition-colors duration-300;
+            }
+        }
+        @layer components {
+            .card {
+                @apply bg-white dark:bg-slate-800 p-8 rounded-xl shadow-2xl transition-all duration-300;
+            }
+            .input-group {
+                @apply mb-6;
+            }
+            .input-group label {
+                @apply block text-sm font-semibold mb-2 text-gray-700 dark:text-gray-300;
+            }
+            .input-group input, .input-group textarea {
+                @apply w-full px-4 py-3 rounded-lg bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-sky-500 transition-colors duration-200;
+            }
+            .btn {
+                @apply px-6 py-3 rounded-lg font-semibold transition-all duration-200;
+            }
+            .btn-primary {
+                @apply bg-sky-600 text-white hover:bg-sky-700;
+            }
+            .btn-secondary {
+                @apply bg-gray-200 text-gray-800 dark:bg-slate-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-slate-600;
+            }
+        }
+    </style>
+</head>
+
+<body class="font-sans antialiased">
+
+    <main class="container mx-auto p-4 md:p-8 max-w-4xl">
+        <h1 class="text-3xl md:text-4xl font-extrabold text-center my-8 md:my-12 tracking-tight">Review & Send Email
+        </h1>
+
+        <button id="theme-toggle"
+            class="absolute top-4 right-4 p-2 rounded-full bg-gray-200 dark:bg-slate-700 hover:bg-gray-300 dark:hover:bg-slate-600 transition-colors duration-200">
+            <svg id="sun-icon" class="h-6 w-6 text-yellow-500 hidden" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707">
+                </path>
+            </svg>
+            <svg id="moon-icon" class="h-6 w-6 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+            </svg>
+        </button>
+
+        <section class="card">
+            <h2 class="text-2xl font-bold mb-6 text-center md:text-left">Finalize Your Email</h2>
+            <form id="send-form">
+
+                <div id="action-needed-message"
+                    class="p-4 rounded-lg bg-yellow-100 dark:bg-yellow-950 text-yellow-800 dark:text-yellow-200 font-semibold mb-6 hidden">
+                    <p id="action-needed-text"></p>
+                </div>
+
+
+                <div class="input-group">
+                    <label for="to-email">Recipient's Email</label>
+                    <input type="email" id="to-email" name="to" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="my-email-response">Your Email</label>
+                    <input type="email" id="my-email-response" name="myEmail" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="email-subject">Subject</label>
+                    <input type="text" id="email-subject" name="subject" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="email-body">Email Body</label>
+                    <textarea id="email-body" name="text" rows="15" required></textarea>
+                </div>
+
+                <div class="mt-6 mb-4">
+                    <h3 class="font-semibold text-gray-700 dark:text-gray-300 mb-2">Attached CV/Resume</h3>
+                    <div id="cv-view-link"
+                        class="bg-gray-50 dark:bg-slate-700 p-4 rounded-lg flex items-center justify-between hidden">
+                        <span id="cv-file-name" class="font-mono text-sm text-gray-500 dark:text-gray-400"></span>
+                        <a id="view-cv-btn" href="#" target="_blank"
+                            class="btn btn-secondary text-sm">View
+                            CV</a>
+                    </div>
+                </div>
+
+                <div class="flex justify-center md:justify-end mt-8 gap-4">
+                    <a href="index.html" class="btn btn-secondary">Go Back</a>
+                    <button type="submit" class="btn btn-primary">Send Email</button>
+                </div>
+            </form>
+        </section>
+
+    </main>
+
+    <!-- Loading/Success/Error Modal Overlay -->
+    <div id="state-container"
+        class="fixed inset-0 bg-gray-900 bg-opacity-70 flex items-center justify-center z-50 hidden transition-opacity duration-300">
+        <div id="loading-state" class="card text-center p-8 hidden">
+            <div class="animate-spin h-12 w-12 border-4 border-sky-500 border-t-transparent rounded-full mx-auto mb-4">
+            </div>
+            <p class="text-xl font-semibold">Sending your email...</p>
+        </div>
+        <div id="error-state" class="card p-8 bg-red-100 dark:bg-red-950 text-red-800 dark:text-red-200 hidden">
+            <p id="error-message" class="font-semibold text-lg"></p>
+        </div>
+        <div id="success-state"
+            class="card p-8 text-center bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-200 hidden flex flex-col items-center">
+            <svg class="h-16 w-16 text-green-500 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+            <h3 class="text-2xl font-bold mb-2">Email Sent Successfully!</h3>
+            <p class="text-lg mb-6">You can now close this page or start over.</p>
+            <div class="flex justify-center space-x-4 mt-6">
+                <button id="close-button" class="btn btn-secondary">Close</button>
+                <a href="/" class="btn btn-primary">Start New Application</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = ''; // Relative path
+        const sendForm = document.getElementById('send-form');
+        const stateContainer = document.getElementById('state-container');
+        const loadingState = document.getElementById('loading-state');
+        const errorState = document.getElementById('error-state');
+        const successState = document.getElementById('success-state');
+        const closeButton = document.getElementById('close-button');
+        const myEmailField = document.getElementById('my-email-response');
+        const cvFileNameSpan = document.getElementById('cv-file-name');
+        const viewCvBtn = document.getElementById('view-cv-btn');
+
+        // Theme Toggle
+        const themeToggle = document.getElementById('theme-toggle');
+        const sunIcon = document.getElementById('sun-icon');
+        const moonIcon = document.getElementById('moon-icon');
+        const isDark = localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        if (isDark) document.documentElement.classList.add('dark');
+        sunIcon.classList.toggle('hidden', !isDark);
+        moonIcon.classList.toggle('hidden', isDark);
+        themeToggle.addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark');
+            const isNowDark = document.documentElement.classList.contains('dark');
+            localStorage.theme = isNowDark ? 'dark' : 'light';
+            sunIcon.classList.toggle('hidden', !isNowDark);
+            moonIcon.classList.toggle('hidden', isNowDark);
+        });
+
+        // Load data from server on page load
+        window.addEventListener('load', async () => {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/review-data`);
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Failed to load composed email data.');
+                }
+                const { emailData, myEmail, cvFilename, cvPath } = await response.json();
+
+                document.getElementById('to-email').value = emailData.to || '';
+                myEmailField.value = myEmail || '';
+                document.getElementById('email-subject').value = emailData.subject || '';
+                document.getElementById('email-body').value = emailData.text || '';
+
+                
+                // Handle CV display logic
+                if (cvFilename) {
+                    // A CV is present, so make the container visible.
+                    document.getElementById('cv-view-link').classList.remove('hidden');
+                    cvFileNameSpan.textContent = cvFilename;
+
+                    if (cvPath) {
+                        // If a path is available (from .env), show the "View" button.
+                        viewCvBtn.href = '/' + cvPath.replace(/\\/g, '/'); // Ensure absolute path with forward slashes
+                    } else {
+                        // If no path (uploaded file), hide the "View" button.
+                        viewCvBtn.style.display = 'none';
+                    }
+                }
+
+                if (emailData.actionNeeded) {
+                    document.getElementById('action-needed-text').innerHTML = `<strong>Action Needed:</strong> ${emailData.actionNeeded}`;
+                    document.getElementById('action-needed-message').classList.remove('hidden');
+                }
+
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Could not load review data. You may need to compose the email again. Redirecting to home page.');
+                window.location.href = '/'; // Redirect back if no data is found
+            }
+        });
+
+        // Send Email Form Submission
+        sendForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            stateContainer.classList.remove('hidden');
+            loadingState.classList.remove('hidden');
+            errorState.classList.add('hidden');
+            successState.classList.add('hidden');
+
+            const emailData = {
+                to: document.getElementById('to-email').value,
+                subject: document.getElementById('email-subject').value,
+                text: document.getElementById('email-body').value,
+                html: '' // Not used, but good to have
+            };
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/sendEmail`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(emailData),
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+                }
+
+                loadingState.classList.add('hidden');
+                successState.classList.remove('hidden');
+
+            } catch (error) {
+                loadingState.classList.add('hidden');
+                errorState.classList.remove('hidden');
+                document.getElementById('error-message').innerHTML = `Failed to send email: ${error.message}<br><button onclick="location.reload()" class="btn btn-secondary mt-4">Try Again</button>`;
+                console.error('Error:', error);
+            }
+        });
+
+        // Close button functionality for success state
+        closeButton.addEventListener('click', () => {
+            // successState.style.display = 'none';
+            // applicationForm.style.display = 'block';
+            stateContainer.classList.add('hidden');
+        });
+
+    </script>
+</body>
+
+</html>
