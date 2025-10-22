@@ -24,7 +24,10 @@ app.use(session({
   secret: process.env.SESSION_SECRET || 'supersecretkey', // Use a strong secret in production
   resave: false,
   saveUninitialized: true,
-  cookie: { secure: process.env.NODE_ENV === 'production' } // Set to true in production with HTTPS
+  cookie: { 
+    secure: process.env.NODE_ENV === 'production', // Set to true in production with HTTPS
+    httpOnly: true, // Add httpOnly flag for security
+  }
 }));
 
 // Serve static files from the 'public' directory

@@ -17,6 +17,24 @@ Follow these instructions to get a copy of the project up and running on your lo
 
 - [Node.js](https://nodejs.org/) (which includes npm) installed on your system.
 
+### Tech Stack
+-   **Runtime Environment**:
+    - Node.js
+-   **Backend**:
+    -   Express.js (inferred from SESSION_SECRET and server setup)
+    -   Nodemailer
+-   **Frontend**:
+    -   React
+    -   HTML
+    -   CSS
+    -   JavaScript
+-   **APIs & Services**:
+    -   Google Gemini API
+-   **Development Tools**:
+    -   npm
+    -   Git
+    -   dotenv (for environment variables)
+
 ### Installation
 
 1.  **Clone the repository:**

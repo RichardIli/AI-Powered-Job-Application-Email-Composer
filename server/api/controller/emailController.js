@@ -8,15 +8,27 @@ exports.getAppConfig = (req, res) => {
     // --- Temporary Debugging ---
     // Log the status of the required environment variables to the server console.
     console.log('--- Checking .env variables for /api/config ---');
-    console.log('EMAIL_USER:', process.env.EMAIL_USER ? 'Found' : 'MISSING or empty');
-    console.log('EMAIL_PASS:', process.env.EMAIL_PASS ? 'Found' : 'MISSING or empty');
-    console.log('EMAIL_SERVICE:', process.env.EMAIL_SERVICE ? 'Found' : 'MISSING or empty');
-    console.log('API_KEY:', process.env.API_KEY ? 'Found' : 'MISSING or empty');
+    const emailUser = process.env.EMAIL_USER;
+    const emailPass = process.env.EMAIL_PASS;
+    const emailService = process.env.EMAIL_SERVICE;
+    const apiKey = process.env.API_KEY;
+    console.log('EMAIL_USER:', emailUser ? 'Found' : 'MISSING or empty');
+    console.log('EMAIL_PASS:', emailPass ? 'Found' : 'MISSING or empty');
+    console.log('EMAIL_SERVICE:', emailService ? 'Found' : 'MISSING or empty');
+    console.log('API_KEY:', apiKey ? 'Found' : 'MISSING or empty');
     console.log('---------------------------------------------');
 
     // Credentials are fully predefined if user, pass, and service are in .env
-    const hasPredefinedEmail = !!(process.env.EMAIL_USER && process.env.EMAIL_PASS && process.env.EMAIL_SERVICE);
-    const hasPredefinedApiKey = !!process.env.API_KEY;
+    const hasPredefinedEmail = !!(emailUser && emailPass && emailService);
+    const hasPredefinedApiKey = !!apiKey;
+
+    if (hasPredefinedEmail && (!emailUser || !emailPass || !emailService)) {
+        console.error('Inconsistent email configuration: EMAIL_USER, EMAIL_PASS, and EMAIL_SERVICE must all be defined.');
+    }
+
+    if (hasPredefinedApiKey && !apiKey) {
+        console.error('Inconsistent API key configuration: API_KEY must be defined.');
+    }
 
     res.json({
         // Let the frontend know if email credentials are set in the environment.
